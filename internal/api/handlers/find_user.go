@@ -3,6 +3,7 @@ package handlers
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"onboarding/internal/api/handlers/response"
 	"onboarding/internal/service"
 )
 
@@ -11,8 +12,7 @@ func FindUser(c *gin.Context) {
 	u := service.GetUserById(id)
 
 	if u == nil {
-		c.IndentedJSON(http.StatusNotFound, &service.AppError{
-			Message: "User not found", ErrorType: service.OnboardingError})
+		c.IndentedJSON(http.StatusNotFound, response.ErrorResponse{Message: "User not found"})
 	} else {
 		c.IndentedJSON(http.StatusOK, u)
 	}

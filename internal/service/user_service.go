@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/pkg/errors"
 	"math/rand"
 	"onboarding/internal/database"
 	"onboarding/internal/util"
@@ -15,9 +16,9 @@ func GetAllUsers() []database.User {
 	return database.GetAllUsers()
 }
 
-func SaveUser(u database.User) (*database.User, *AppError) {
+func SaveUser(u database.User) (*database.User, error) {
 	if e := validate(u); e != nil {
-		return nil, e
+		return nil, errors.Wrap(e, "Error saving user")
 	}
 	//TODO validar regras de nomes únicos no BD
 

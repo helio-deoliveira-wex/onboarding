@@ -3,10 +3,11 @@ package service
 import (
 	"errors"
 	"onboarding/internal/database"
+	"onboarding/internal/service/app_error"
 	"strings"
 )
 
-func validate(u database.User) *AppError {
+func validate(u database.User) *app_error.ValidationError {
 	errList := make([]string, 0, 10)
 	if err := validateAge(u.Age); err != nil {
 		errList = append(errList, err.Error())
@@ -21,7 +22,9 @@ func validate(u database.User) *AppError {
 	}
 
 	if len(errList) > 0 {
-		return &AppError{Message: "User did not pass validation", Details: errList, ErrorType: ValidationError}
+		return &app_error.ValidationError{
+			OnboardingError: app_error.OnboardingError{Message: "User did not pass validation"},
+			Details:         errList}
 	}
 	return nil
 }
