@@ -6,36 +6,41 @@ import (
 	"time"
 )
 
-// DB mock
-var (
-	users = make(map[string]User)
+type UserRepo struct {
+	users map[string]User
 	mu    sync.RWMutex
-)
+}
 
-func GetUser(id string) *User {
-	mu.RLock()
-	defer mu.RUnlock()
-	u, ok := users[id]
+func NewUserRepo() *UserRepo {
+	return &UserRepo{
+		users: make(map[string]User),
+	}
+}
+
+func (ur *UserRepo) GetUser(id string) *User {
+	ur.mu.RLock()
+	defer ur.mu.RUnlock()
+	u, ok := ur.users[id]
 	if !ok {
 		return nil
 	}
 	return &u
 }
 
-func GetAllUsers() []User {
-	mu.RLock()
-	defer mu.RUnlock()
-	list := make([]User, 0, len(users))
-	for _, v := range users {
+func (ur *UserRepo) GetAllUsers() []User {
+	ur.mu.RLock()
+	defer ur.mu.RUnlock()
+	list := make([]User, 0, len(ur.users))
+	for _, v := range ur.users {
 		list = append(list, v)
 	}
 	return list
 }
 
-func GetTotalUsers() int {
-	mu.RLock()
-	defer mu.RUnlock()
-	return len(users)
+func (ur *UserRepo) GetTotalUsers() int {
+	ur.mu.RLock()
+	defer ur.mu.RUnlock()
+	return len(ur.users)
 }
 
 var (
@@ -43,13 +48,13 @@ var (
 	ErrUserUIsEmpty error = errors.New("user is empty")
 )
 
-func PutUser(u *User) error {
-	mu.Lock()
-	defer mu.Unlock()
+func (ur *UserRepo) PutUser(u *User) error {
+	ur.mu.Lock()
+	defer ur.mu.Unlock()
 	if u == nil {
 		return errors.Join(ErrInvalidUser, ErrUserUIsEmpty)
 	}
 	u.UpdatedAt = time.Now()
-	users[u.Id] = *u
+	ur.users[u.Id] = *u
 	return nil
 }

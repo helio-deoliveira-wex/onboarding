@@ -1,13 +1,15 @@
 package handlers
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
+
 	"onboarding/internal/api/handlers/response"
 	"onboarding/internal/service"
+
+	"github.com/gin-gonic/gin"
 )
 
-func FindUser(c *gin.Context) {
+func (uh *UserHandler) FindUser(c *gin.Context) {
 	id := c.Param("id")
 	u := service.GetUserById(id)
 

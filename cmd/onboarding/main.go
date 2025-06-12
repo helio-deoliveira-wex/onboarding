@@ -1,9 +1,13 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
 	"onboarding/internal/api"
+	"onboarding/internal/api/handlers"
+	"onboarding/internal/database"
+	"onboarding/internal/service"
 	"onboarding/internal/util"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -12,6 +16,11 @@ func main() {
 
 	//HTTP server:
 	router := gin.Default()
-	api.ConfigRoutes(router)
+
+	userRepo := database.NewUserRepo()
+	userService := service.NewUserService(userRepo)
+	userHandler := handlers.NewUserHandler(userService)
+	
+	api.ConfigRoutes(router, userRepo)
 	router.Run("localhost:8080")
 }
