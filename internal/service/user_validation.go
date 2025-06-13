@@ -2,58 +2,84 @@ package service
 
 import (
 	"errors"
-	"onboarding/internal/database"
-	"onboarding/internal/service/app_error"
+	"onboarding/internal/model"
 	"strings"
 )
 
-func validate(u database.User) *app_error.ValidationError {
+const InvalidUserMessage = "User did not pass validation"
+
+var (
+	ErrUserInvalidAge         = errors.New("User does not meet minimum age requirement")
+	ErrUserInvalidName        = errors.New("User first/last names required")
+	ErrUserEmailRequired      = errors.New("User email required")
+	ErrUserEmailInvalidFormat = errors.New("User email must be properly formatted")
+)
+
+type ErrUserValidation struct {
+	Message string   `json:"error"`
+	Details []string `json:"details,omitempty"`
+}
+
+func (e ErrUserValidation) Error() string {
+	return InvalidUserMessage
+}
+
+func (e ErrUserValidation) Is(target error) bool {
+	return target != nil && target.Error() == e.Error()
+}
+
+type UserValidation struct {
+}
+
+func NewUserValidation() *UserValidation {
+	return &UserValidation{}
+}
+
+func (v *UserValidation) Validate(u *model.User) *ErrUserValidation {
 	errList := make([]string, 0, 10)
-	if err := validateAge(u.Age); err != nil {
+	if err := v.validateAge(u.Age); err != nil {
 		errList = append(errList, err.Error())
 	}
-	if err := validateName(u.FirstName); err != nil {
+	if err := v.validateName(u.FirstName); err != nil {
 		errList = append(errList, err.Error())
-	} else if err := validateName(u.LastName); err != nil {
+	} else if err := v.validateName(u.LastName); err != nil {
 		errList = append(errList, err.Error())
 	}
-	if err := validateEmail(u.Email); err != nil {
+	if err := v.validateEmail(u.Email); err != nil {
 		errList = append(errList, err.Error())
 	}
 
 	if len(errList) > 0 {
-		return &app_error.ValidationError{
-			OnboardingError: app_error.OnboardingError{Message: "User did not pass validation"},
-			Details:         errList}
+		return &ErrUserValidation{Message: InvalidUserMessage, Details: errList}
 	}
 	return nil
 }
 
-func validateAge(a int) error {
+func (v *UserValidation) validateAge(a int) error {
 	if a < 18 {
-		return errors.New("User does not meet minimum age requirement")
+		return ErrUserInvalidAge
 	}
 	return nil
 }
 
-func validateName(n string) error {
-	if isEmptyName(n) {
-		return errors.New("User first/last names required")
+func (v *UserValidation) validateName(n string) error {
+	if v.isEmptyName(n) {
+		return ErrUserInvalidName
 	}
 	return nil
 }
 
-func validateEmail(e string) error {
-	if isEmptyName(e) {
-		return errors.New("User email required")
+func (v *UserValidation) validateEmail(e string) error {
+	if v.isEmptyName(e) {
+		return ErrUserEmailRequired
 	}
 	if !strings.Contains(e, "@") {
-		return errors.New("User email must be properly formatted")
+		return ErrUserEmailInvalidFormat
 	}
 	return nil
 }
 
-func isEmptyName(n string) bool {
+func (v *UserValidation) isEmptyName(n string) bool {
 	n = strings.TrimSpace(n)
 	return len(n) == 0
 }

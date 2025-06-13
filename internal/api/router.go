@@ -5,8 +5,30 @@ import (
 	"onboarding/internal/api/handlers"
 )
 
-func ConfigRoutes(router *gin.Engine) {
-	router.POST("/save", handlers.SaveUser)
-	router.GET("/find/:id", handlers.FindUser)
-	router.GET("/list", handlers.ListAllUsers)
+var (
+	saveUserHandler     *handlers.SaveUserHandler
+	findUserHandler     *handlers.FindUserHandler
+	listAllUsersHandler *handlers.ListAllUsersHandler
+)
+
+func ConfigRoutes(router *gin.Engine, us *handlers.IUserService) {
+	saveUserHandler = handlers.NewSaveUserHandler(us)
+	findUserHandler = handlers.NewFindUserHandler(us)
+	listAllUsersHandler = handlers.NewListAllUsersHandler(us)
+
+	router.POST("/save", saveUser)
+	router.GET("/find/:id", findUser)
+	router.GET("/list", listAllUsers)
+}
+
+func saveUser(c *gin.Context) {
+	saveUserHandler.SaveUser(c)
+}
+
+func findUser(c *gin.Context) {
+	findUserHandler.FindUser(c)
+}
+
+func listAllUsers(c *gin.Context) {
+	listAllUsersHandler.ListAllUsers(c)
 }

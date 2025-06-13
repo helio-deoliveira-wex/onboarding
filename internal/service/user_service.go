@@ -1,47 +1,50 @@
 package service
 
 import (
-	"github.com/pkg/errors"
 	"math/rand"
-	"onboarding/internal/database"
-	"onboarding/internal/util"
 	"strconv"
+
+	"onboarding/internal/model"
+	"onboarding/internal/util"
 )
 
-func GetUserById(id string) *database.User {
-	return database.GetUser(id)
+type UserService struct {
+	repo      *IUserRepository
+	validator *UserValidation
 }
 
-func GetAllUsers() []database.User {
-	return database.GetAllUsers()
+func NewUserService(repo *IUserRepository) *UserService {
+	return &UserService{
+		repo: repo, validator: NewUserValidation()}
 }
 
-func SaveUser(u database.User) (*database.User, error) {
-	if e := validate(u); e != nil {
-		return nil, errors.Wrap(e, "Error saving user")
+func (us *UserService) GetUserById(id string) *model.User {
+	return (*us.repo).GetUser(id)
+}
+
+func (us *UserService) GetAllUsers() []model.User {
+	return (*us.repo).GetAllUsers()
+}
+
+func (us *UserService) SaveUser(u *model.User) error {
+	if err := (*us.validator).Validate(u); err != nil {
+		return err
 	}
-	//TODO validar regras de nomes únicos no BD
+	// TODO validar regras de nomes únicos no BD
 
-	if database.GetUser(u.Id) != nil {
-		updateUser(u)
-	} else {
-		u = insertUser(u)
-	}
-
-	return &u, nil
+	return us.insertOrUpdate(u)
 }
 
-func updateUser(u database.User) {
-	database.PutUser(u)
-}
-
-func insertUser(u database.User) database.User {
+func (us *UserService) insertOrUpdate(u *model.User) error {
 	if u.Id == "" {
 		u.Id = "user-" + strconv.Itoa(1000+rand.Intn(1000))
 	}
-	database.PutUser(u)
-	util.AppLogger.Info("New user created",
-		"user", u,
-		"totalOfUsers", database.GetTotalUsers())
-	return u
+
+	if err := (*us.repo).PutUser(u); err != nil {
+		util.AppLogger.Error("Error saving user",
+			"user", u,
+			"error", err)
+		return err
+	}
+	return nil
 }

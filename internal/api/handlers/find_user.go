@@ -3,16 +3,23 @@ package handlers
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"onboarding/internal/api/handlers/response"
-	"onboarding/internal/service"
+	"onboarding/internal/pkg/api_response"
 )
 
-func FindUser(c *gin.Context) {
+type FindUserHandler struct {
+	userService *IUserService
+}
+
+func NewFindUserHandler(us *IUserService) *FindUserHandler {
+	return &FindUserHandler{userService: us}
+}
+
+func (fu *FindUserHandler) FindUser(c *gin.Context) {
 	id := c.Param("id")
-	u := service.GetUserById(id)
+	u := (*fu.userService).GetUserById(id)
 
 	if u == nil {
-		c.IndentedJSON(http.StatusNotFound, response.ErrorResponse{Message: "User not found"})
+		c.IndentedJSON(http.StatusNotFound, api_response.ErrorResponse{Message: "User not found"})
 	} else {
 		c.IndentedJSON(http.StatusOK, u)
 	}

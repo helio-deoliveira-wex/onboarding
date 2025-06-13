@@ -3,9 +3,16 @@ package handlers
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"onboarding/internal/service"
 )
 
-func ListAllUsers(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK, service.GetAllUsers())
+type ListAllUsersHandler struct {
+	userService *IUserService
+}
+
+func NewListAllUsersHandler(us *IUserService) *ListAllUsersHandler {
+	return &ListAllUsersHandler{userService: us}
+}
+
+func (lu *ListAllUsersHandler) ListAllUsers(c *gin.Context) {
+	c.IndentedJSON(http.StatusOK, (*lu.userService).GetAllUsers())
 }
