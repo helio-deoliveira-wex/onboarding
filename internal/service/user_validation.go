@@ -24,9 +24,9 @@ func (e ErrUserValidation) Error() string {
 	return InvalidUserMessage
 }
 
-func (e ErrUserValidation) Is(target error) bool {
-	return target != nil && target.Error() == e.Error()
-}
+//func (e ErrUserValidation) Is(target error) bool {
+//	return target != nil && target.Error() == e.Error()
+//}
 
 type UserValidation struct {
 }
@@ -35,7 +35,7 @@ func NewUserValidation() *UserValidation {
 	return &UserValidation{}
 }
 
-func (v *UserValidation) Validate(u *model.User) *ErrUserValidation {
+func (v *UserValidation) Validate(u *model.User) error {
 	errList := make([]string, 0, 10)
 	if err := v.validateAge(u.Age); err != nil {
 		errList = append(errList, err.Error())
@@ -50,7 +50,7 @@ func (v *UserValidation) Validate(u *model.User) *ErrUserValidation {
 	}
 
 	if len(errList) > 0 {
-		return &ErrUserValidation{Message: InvalidUserMessage, Details: errList}
+		return ErrUserValidation{Message: InvalidUserMessage, Details: errList}
 	}
 	return nil
 }

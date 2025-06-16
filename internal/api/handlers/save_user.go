@@ -30,8 +30,10 @@ func (h *SaveUserHandler) SaveUser(c *gin.Context) {
 			"user", newUser,
 			"error", err)
 
-		var errUserValidation = service.ErrUserValidation{Message: service.InvalidUserMessage}
-		if errors.Is(err, errUserValidation) {
+		//var errUserValidation = &service.ErrUserValidation{Message: service.InvalidUserMessage}
+		var errUserValidation = service.ErrUserValidation{}
+		//if errors.Is(err, errUserValidation) {
+		if errors.As(err, &errUserValidation) {
 			c.IndentedJSON(http.StatusBadRequest, err)
 		} else {
 			c.IndentedJSON(http.StatusInternalServerError, err)

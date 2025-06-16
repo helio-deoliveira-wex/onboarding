@@ -1,0 +1,26 @@
+#quiet: False
+#disable-version-string: True
+#with-expecter: True
+#mockname: "{{.InterfaceName}}"
+#filename: "{{.MockName}}.go"
+#outpkg: mocks
+#dir: "mocks"
+#packages:
+#  onboarding/internal/service:
+#    interfaces:
+#      IUserRepository:
+
+with-expecter: true
+packages:
+#  github.com/helio-deoliveira-wex/onboarding:
+#  onboarding/internal/service:
+  onboarding/internal/api/handlers:
+  # place your package-specific config here
+#    config:
+    interfaces:
+      # select the interfaces you want mocked
+#      IUserRepository:
+        # Modify package-level config for this specific interface (if applicable)
+#        config:
+      IUserService:
+        # Modify package-level config for this specific interface (if applicable)

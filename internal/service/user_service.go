@@ -27,7 +27,7 @@ func (us *UserService) GetAllUsers() []model.User {
 }
 
 func (us *UserService) SaveUser(u *model.User) error {
-	if err := (*us.validator).Validate(u); err != nil {
+	if err := us.validator.Validate(u); err != nil {
 		return err
 	}
 	// TODO validar regras de nomes únicos no BD
