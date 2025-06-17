@@ -12,9 +12,9 @@ var (
 )
 
 func ConfigRoutes(router *gin.Engine, us *handlers.IUserService) {
-	saveUserHandler = handlers.NewSaveUserHandler(us)
-	findUserHandler = handlers.NewFindUserHandler(us)
-	listAllUsersHandler = handlers.NewListAllUsersHandler(us)
+	saveUserHandler = handlers.NewSaveUserHandler(*us)
+	findUserHandler = handlers.NewFindUserHandler(*us)
+	listAllUsersHandler = handlers.NewListAllUsersHandler(*us)
 
 	router.POST("/save", saveUser)
 	router.GET("/find/:id", findUser)

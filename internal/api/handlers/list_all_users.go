@@ -9,8 +9,8 @@ type ListAllUsersHandler struct {
 	userService *IUserService
 }
 
-func NewListAllUsersHandler(us *IUserService) *ListAllUsersHandler {
-	return &ListAllUsersHandler{userService: us}
+func NewListAllUsersHandler(us IUserService) *ListAllUsersHandler {
+	return &ListAllUsersHandler{userService: &us}
 }
 
 func (lu *ListAllUsersHandler) ListAllUsers(c *gin.Context) {

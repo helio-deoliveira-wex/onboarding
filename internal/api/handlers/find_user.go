@@ -10,8 +10,8 @@ type FindUserHandler struct {
 	userService *IUserService
 }
 
-func NewFindUserHandler(us *IUserService) *FindUserHandler {
-	return &FindUserHandler{userService: us}
+func NewFindUserHandler(us IUserService) *FindUserHandler {
+	return &FindUserHandler{userService: &us}
 }
 
 func (fu *FindUserHandler) FindUser(c *gin.Context) {

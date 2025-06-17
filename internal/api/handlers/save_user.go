@@ -14,14 +14,15 @@ type SaveUserHandler struct {
 	userService *IUserService
 }
 
-func NewSaveUserHandler(us *IUserService) *SaveUserHandler {
-	return &SaveUserHandler{userService: us}
+func NewSaveUserHandler(us IUserService) *SaveUserHandler {
+	return &SaveUserHandler{userService: &us}
 }
 
 func (h *SaveUserHandler) SaveUser(c *gin.Context) {
 	var newUser model.User
 	if err := c.BindJSON(&newUser); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, api_response.ErrorResponse{Message: "Invalid request"})
+		c.IndentedJSON(http.StatusBadRequest, api_response.ErrorResponse{
+			Message: "Invalid request", Details: []string{"Invalid JSON format"}})
 		return
 	}
 
@@ -30,9 +31,7 @@ func (h *SaveUserHandler) SaveUser(c *gin.Context) {
 			"user", newUser,
 			"error", err)
 
-		//var errUserValidation = &service.ErrUserValidation{Message: service.InvalidUserMessage}
 		var errUserValidation = service.ErrUserValidation{}
-		//if errors.Is(err, errUserValidation) {
 		if errors.As(err, &errUserValidation) {
 			c.IndentedJSON(http.StatusBadRequest, err)
 		} else {

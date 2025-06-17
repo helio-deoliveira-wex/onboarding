@@ -15,7 +15,7 @@ func main() {
 
 	//Dependency injection:
 	var userRepository service.IUserRepository = database.NewUserRepo()
-	var userService handlers.IUserService = service.NewUserService(&userRepository)
+	var userService handlers.IUserService = service.NewUserService(userRepository)
 
 	//HTTP server:
 	router := gin.Default()

@@ -13,9 +13,9 @@ type UserService struct {
 	validator *UserValidation
 }
 
-func NewUserService(repo *IUserRepository) *UserService {
+func NewUserService(repo IUserRepository) *UserService {
 	return &UserService{
-		repo: repo, validator: NewUserValidation()}
+		repo: &repo, validator: NewUserValidation()}
 }
 
 func (us *UserService) GetUserById(id string) *model.User {
